@@ -1,0 +1,239 @@
+.chat-list {
+  width: 360px;
+  background-color: var(--bg-chat-list);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  flex-shrink: 0;
+}
+
+@media (max-width: 1024px) {
+  .chat-list {
+    width: 300px;
+  }
+}
+
+@media (max-width: 768px) {
+  .chat-list {
+    display: none; /* Hide for now on mobile, would need a toggle */
+  }
+}
+
+.chat-list-header {
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand h2 {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.toggle-sidebar-btn {
+  font-size: 20px;
+  color: var(--text-muted);
+  margin-right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+}
+
+.toggle-sidebar-btn:hover {
+  background-color: #f1f5f9;
+  color: var(--primary-color);
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.action-btn {
+  font-size: 18px;
+  color: var(--text-muted);
+  padding: 4px;
+}
+
+.search-container {
+  padding: 0 20px 16px;
+}
+
+.search-bar {
+  background-color: #f1f5f9;
+  border-radius: var(--radius-xl);
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.search-icon {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.search-bar input {
+  background: none;
+  border: none;
+  width: 100%;
+  font-size: 14px;
+}
+
+.filter-chips {
+  padding: 0 20px 16px;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+}
+
+.filter-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.chip {
+  padding: 6px 14px;
+  border-radius: var(--radius-xl);
+  background-color: #fff;
+  border: 1px solid var(--border-color);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--text-muted);
+}
+
+.chip.active {
+  background-color: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+.list-container {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.chat-item {
+  padding: 16px 20px;
+  display: flex;
+  gap: 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+  border-bottom: 1px solid #f8fafc;
+}
+
+.chat-item:hover {
+  background-color: #f8fafc;
+}
+
+.chat-item.pinned {
+  background-color: #f1f5f9;
+}
+
+.item-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  background-color: #e2e8f0;
+  flex-shrink: 0;
+}
+
+.item-icon.copilot {
+  background-color: #64748b;
+  color: white;
+}
+
+.item-icon.document {
+  background-color: #475569;
+  color: white;
+  border-radius: var(--radius-md);
+}
+
+.item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 4px;
+}
+
+.item-title {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.item-time {
+  font-size: 11px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.item-subtitle {
+  font-size: 12px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.status-tag {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 4px;
+  text-transform: lowercase;
+}
+
+.status-tag.drafting { color: #3b82f6; }
+.status-tag.review { color: #f59e0b; }
+.status-tag.formatting { color: #8b5cf6; }
+.status-tag.approved { color: #22c55e; }
+
+.item-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.progress-info, .completed-info {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.item-badge {
+  background-color: var(--primary-color);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}
