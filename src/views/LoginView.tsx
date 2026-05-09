@@ -1,17 +1,30 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, Eye, EyeOff, MessageSquare, Zap, Shield, ArrowRight } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, MessageSquare, Zap, Shield, ArrowRight, Loader2 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import './Auth.css';
 
 const LoginView: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    navigate('/chat');
+    setError('');
+    setLoading(true);
+    try {
+      await login(email, password);
+      navigate('/chat');
+    } catch (err: any) {
+      setError(err.message || 'Failed to login');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -59,6 +72,8 @@ const LoginView: React.FC = () => {
 
           <div className="divider">OR</div>
 
+          {error && <div className="error-message" style={{ color: 'red', marginBottom: '1rem', textAlign: 'center' }}>{error}</div>}
+
           <form onSubmit={handleSubmit} className="auth-form">
             <div className="form-group">
               <label htmlFor="email">Email Address</label>
@@ -105,8 +120,17 @@ const LoginView: React.FC = () => {
               <a href="#" className="forgot-link">Forgot password?</a>
             </div>
 
-            <button type="submit" className="submit-btn">
-              Sign In <ArrowRight size={18} style={{ marginLeft: '8px', verticalAlign: 'middle' }} />
+            <button type="submit" className="submit-btn" disabled={loading}>
+              {loading ? (
+                <>
+                  <Loader2 className="spinner" size={18} style={{ marginRight: '8px', verticalAlign: 'middle', animation: 'spin 1s linear infinite' }} />
+                  Signing In...
+                </>
+              ) : (
+                <>
+                  Sign In <ArrowRight size={18} style={{ marginLeft: '8px', verticalAlign: 'middle' }} />
+                </>
+              )}
             </button>
           </form>
 

@@ -1,18 +1,30 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Mail, Lock, Eye, EyeOff, MessageSquare, Zap, Shield, ArrowRight } from 'lucide-react';
+import { User, Mail, Lock, Eye, EyeOff, MessageSquare, Zap, Shield, ArrowRight, Loader2 } from 'lucide-react';
+import { authService } from '../services/authService';
 import './Auth.css';
 
 const RegisterView: React.FC = () => {
-  const [fullName, setFullName] = useState('');
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    navigate('/chat');
+    setError('');
+    setLoading(true);
+    try {
+      await authService.register({ username, email, password });
+      navigate('/login');
+    } catch (err: any) {
+      setError(err.message || 'Failed to register');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -60,17 +72,19 @@ const RegisterView: React.FC = () => {
 
           <div className="divider">OR</div>
 
+          {error && <div className="error-message" style={{ color: 'red', marginBottom: '1rem', textAlign: 'center' }}>{error}</div>}
+
           <form onSubmit={handleSubmit} className="auth-form">
             <div className="form-group">
-              <label htmlFor="fullName">Full Name</label>
+              <label htmlFor="username">Username</label>
               <div className="auth-input-wrapper">
                 <User className="auth-input-icon" size={18} />
                 <input
-                  id="fullName"
+                  id="username"
                   type="text"
-                  placeholder="John Doe"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
+                  placeholder="johndoe"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   required
                 />
               </div>
@@ -113,8 +127,17 @@ const RegisterView: React.FC = () => {
               </div>
             </div>
 
-            <button type="submit" className="submit-btn">
-              Create Account <ArrowRight size={18} style={{ marginLeft: '8px', verticalAlign: 'middle' }} />
+            <button type="submit" className="submit-btn" disabled={loading}>
+              {loading ? (
+                <>
+                  <Loader2 className="spinner" size={18} style={{ marginRight: '8px', verticalAlign: 'middle', animation: 'spin 1s linear infinite' }} />
+                  Creating Account...
+                </>
+              ) : (
+                <>
+                  Create Account <ArrowRight size={18} style={{ marginLeft: '8px', verticalAlign: 'middle' }} />
+                </>
+              )}
             </button>
           </form>
 

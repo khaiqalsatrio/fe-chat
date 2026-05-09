@@ -1,15 +1,45 @@
-import React from 'react';
-import { chatListData } from '../data/dummyData';
+import React, { useEffect, useState } from 'react';
+import { chatService } from '../services/chatService';
+import { IRoom } from '../types/Chat';
 import './ChatList.css';
 import ChatListHeader from './ChatListHeader';
-import { Search, Bot, FileText } from 'lucide-react';
+import { Search, Bot, FileText, User } from 'lucide-react';
+
+import { useAuth } from '../context/AuthContext';
 
 interface ChatListProps {
   toggleSidebar: () => void;
   isSidebarOpen: boolean;
+  onSelectRoom: (room: IRoom) => void;
+  selectedRoomId: string | null;
 }
 
-const ChatList: React.FC<ChatListProps> = ({ toggleSidebar }) => {
+const ChatList: React.FC<ChatListProps> = ({ toggleSidebar, onSelectRoom, selectedRoomId }) => {
+  const [rooms, setRooms] = useState<IRoom[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    const fetchRooms = async () => {
+      try {
+        const data = await chatService.getRooms();
+        setRooms(data);
+      } catch (error) {
+        console.error('Failed to fetch rooms', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRooms();
+  }, []);
+
+  const getRoomName = (room: IRoom) => {
+    if (room.name) return room.name;
+    const otherParticipant = room.participants?.find(p => p.user_id !== user?.id);
+    return otherParticipant?.user?.username || 'Personal Chat';
+  };
+
   return (
     <div className="chat-list">
       <ChatListHeader title="Messanger!" onToggleSidebar={toggleSidebar} />
@@ -30,38 +60,34 @@ const ChatList: React.FC<ChatListProps> = ({ toggleSidebar }) => {
       </div>
 
       <div className="list-container">
-        {chatListData.map((item) => (
-          <div key={item.id} className={`chat-item ${item.isPinned ? 'pinned' : ''}`}>
-            <div className={`item-icon ${item.iconType}`}>
-              {item.iconType === 'copilot' ? <Bot size={22} /> : <FileText size={22} />}
-            </div>
-            <div className="item-content">
-              <div className="item-header">
-                <span className="item-title">{item.title}</span>
-                <span className="item-time">{item.timestamp}</span>
+        {loading ? (
+          <div className="loading">Loading chats...</div>
+        ) : rooms.length === 0 ? (
+          <div className="no-chats">No chats yet</div>
+        ) : (
+          rooms.map((room) => (
+            <div 
+              key={room.id} 
+              className={`chat-item ${selectedRoomId === room.id ? 'active' : ''}`}
+              onClick={() => onSelectRoom(room)}
+            >
+              <div className="item-icon direct">
+                <User size={22} />
               </div>
-              <div className="item-subtitle">
-                {item.subtitle}
-                {item.status && <span className={`status-tag ${item.statusType}`}>{item.status}</span>}
-              </div>
-              {item.progress !== undefined && (
-                <div className="item-footer">
-                   <div className="progress-info">
-                      {item.episodesTotal} episode(s) in progress — {item.progress}% overall
-                   </div>
-                   {item.badgeCount && <span className="item-badge">{item.badgeCount}</span>}
+              <div className="item-content">
+                <div className="item-header">
+                  <span className="item-title">{getRoomName(room)}</span>
+                  <span className="item-time">
+                    {room.lastMessage ? new Date(room.lastMessage.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                  </span>
                 </div>
-              )}
-              {item.episodesCompleted !== undefined && item.episodesCompleted === item.episodesTotal && (
-                 <div className="item-footer">
-                    <div className="completed-info">
-                       ✅ All {item.episodesTotal} episodes completed
-                    </div>
-                 </div>
-              )}
+                <div className="item-subtitle">
+                  {room.lastMessage?.content || 'No messages yet'}
+                </div>
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );

@@ -5,8 +5,8 @@ import { IUser } from '../types/User';
 interface AuthContextType {
   user: IUser | null;
   loading: boolean;
-  login: (username: string, password: string) => Promise<IUser>;
-  logout: () => void;
+  login: (email: string, password: string) => Promise<IUser>;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -33,14 +33,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     initAuth();
   }, []);
 
-  const login = async (username: string, password: string) => {
-    const loggedInUser = await authService.login(username, password);
+  const login = async (email: string, password: string) => {
+    const loggedInUser = await authService.login(email, password);
     setUser(loggedInUser);
     return loggedInUser;
   };
 
-  const logout = () => {
-    authService.logout();
+  const logout = async () => {
+    await authService.logout();
     setUser(null);
   };
 

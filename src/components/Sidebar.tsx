@@ -8,8 +8,12 @@ import {
   History, 
   Library, 
   Bell, 
-  Settings 
+  Settings,
+  LogOut
 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { socketService } from '../services/socketService';
 import './Sidebar.css';
 
 interface SidebarProps {
@@ -17,6 +21,19 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      socketService.disconnect();
+      await logout();
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout failed', error);
+    }
+  };
+
   return (
     <div className={`sidebar ${!isOpen ? 'collapsed' : ''}`}>
       <div className="sidebar-top">
@@ -63,13 +80,17 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
       </div>
       
       <div className="sidebar-bottom">
+        <div className="sidebar-item" onClick={handleLogout} style={{ cursor: 'pointer' }}>
+          <span className="sidebar-icon"><LogOut size={20} /></span>
+          <span className="sidebar-label">Logout</span>
+        </div>
         <div className="sidebar-item">
           <span className="sidebar-icon"><Settings size={20} /></span>
           <span className="sidebar-label">Settings</span>
         </div>
         <div className="sidebar-avatar-container">
-          <div className="sidebar-avatar">DA</div>
-          <span className="sidebar-label">Daffa Adli</span>
+          <div className="sidebar-avatar">{user?.username?.substring(0, 2).toUpperCase() || '??'}</div>
+          <span className="sidebar-label">{user?.username || 'Guest'}</span>
         </div>
       </div>
     </div>

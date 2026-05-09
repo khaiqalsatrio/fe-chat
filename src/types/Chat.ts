@@ -10,12 +10,20 @@ export interface IMessage {
   sender?: IUser;
 }
 
+export interface IRoomParticipant {
+  id: string;
+  room_id: string;
+  user_id: string;
+  role: string;
+  user: IUser;
+}
+
 export interface IRoom {
   id: string;
   name: string;
   type: string;
   lastMessage?: IMessage;
-  participants: IUser[];
+  participants: IRoomParticipant[];
 }
 
 export class Message implements IMessage {
@@ -27,14 +35,14 @@ export class Message implements IMessage {
   createdAt: string;
   sender?: IUser;
 
-  constructor({ id, roomId, senderId, content, type, createdAt, sender }: any) {
-    this.id = id;
-    this.roomId = roomId;
-    this.senderId = senderId;
-    this.content = content;
-    this.type = type;
-    this.createdAt = createdAt;
-    this.sender = sender;
+  constructor(data: any) {
+    this.id = data.id;
+    this.roomId = data.roomId || data.room_id;
+    this.senderId = data.senderId || data.sender_id;
+    this.content = data.content;
+    this.type = data.type;
+    this.createdAt = data.createdAt || data.created_at;
+    this.sender = data.sender;
   }
 }
 
@@ -43,7 +51,7 @@ export class Room implements IRoom {
   name: string;
   type: string;
   lastMessage?: IMessage;
-  participants: IUser[];
+  participants: IRoomParticipant[];
 
   constructor({ id, name, type, lastMessage, participants }: any) {
     this.id = id;
