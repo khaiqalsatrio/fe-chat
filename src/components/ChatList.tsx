@@ -38,7 +38,6 @@ const ChatList: React.FC<ChatListProps> = ({ toggleSidebar, onSelectRoom, select
       <div className="filter-chips">
         <button className="chip active">All</button>
         <button className="chip">Group</button>
-        <button className="chip">Direct</button>
         <button className="chip">Project</button>
         <button className="chip">Document</button>
       </div>
@@ -50,8 +49,8 @@ const ChatList: React.FC<ChatListProps> = ({ toggleSidebar, onSelectRoom, select
           <div className="no-chats">No chats yet</div>
         ) : (
           rooms.map((room) => (
-            <div 
-              key={room.id} 
+            <div
+              key={room.id}
               className={`chat-item ${selectedRoomId === room.id ? 'active' : ''}`}
               onClick={() => onSelectRoom(room)}
             >

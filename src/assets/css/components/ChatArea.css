@@ -176,16 +176,16 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 20px;
+  gap: 8px;
+  padding: 24px;
 }
 
 .message-row {
   display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  max-width: 80%;
-  margin-bottom: 4px;
+  align-items: flex-end;
+  gap: 8px;
+  max-width: 85%;
+  margin-bottom: 2px;
 }
 
 .message-row.sent {
@@ -199,17 +199,12 @@
 }
 
 .message-avatar {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  background-color: #e2e8f0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: 700;
   flex-shrink: 0;
-  overflow: hidden;
+  margin-bottom: 4px;
+  overflow: hidden; /* Ensure image doesn't bleed out */
 }
 
 .message-avatar img {
@@ -218,49 +213,72 @@
   object-fit: cover;
 }
 
-/* Warna Biru Ungu untuk pesan kita */
-.sent .message-bubble {
-  background-color: #4f46e5;
-  color: white;
-  border-radius: 12px 12px 0px 12px;
-}
-
-/* Warna Abu-abu untuk pesan lawan */
-.received .message-bubble {
-  background-color: #e5e7eb;
-  color: #1f2937;
-  border-radius: 12px 12px 12px 0px;
-}
-
-.message-bubble {
-  padding: 10px 14px;
-  font-size: 14px;
-  line-height: 1.5;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-}
-
 .message-bubble-container {
   display: flex;
   flex-direction: column;
 }
 
-.message-sender-name {
-  display: none;
+.message-bubble {
+  padding: 8px 14px; /* Slightly smaller padding */
+  font-size: 14px;
+  line-height: 1.4;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+/* Sent Messages - Modern Green Gradient & Shadow (WA Style) */
+.sent .message-bubble {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border-radius: 18px 18px 4px 18px;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+
+.sent .message-bubble:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.25);
+}
+
+/* Received Messages - Soft Neutral Look */
+.received .message-bubble {
+  background-color: white;
+  color: #1e293b;
+  border-radius: 18px 18px 18px 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f1f5f9;
+}
+
+.dark .received .message-bubble {
+  background-color: #1e293b;
+  color: #f8fafc;
+  border-color: #334155;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .message-footer {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
   margin-top: 4px;
 }
 
 .message-time {
-  font-size: 10px;
-  opacity: 0.6;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
 }
 
 .sent .message-time {
-  color: #e0e7ff;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.received .message-time {
+  color: #64748b;
+}
+
+.dark .received .message-time {
+  color: #94a3b8;
 }
 
 .loading-container {
@@ -269,4 +287,48 @@
   align-items: center;
   height: 100%;
   color: var(--text-muted);
+}
+
+.encryption-notice {
+  background-color: #fff9c4; /* Yellowish background like WA */
+  color: #546e7a;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 11px;
+  line-height: 1.5;
+  max-width: 90%;
+  margin: 10px auto 20px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.dark .encryption-notice {
+  background-color: #33311e;
+  color: #b0bec5;
+  border: 1px solid #454228;
+}
+
+.encryption-notice strong {
+  color: #263238;
+}
+
+.dark .encryption-notice strong {
+  color: #eceff1;
+}
+
+.encryption-notice svg {
+  flex-shrink: 0;
+  opacity: 0.8;
+}
+
+.message-status {
+  color: #93c5fd; /* Light blue for checkmarks */
+  margin-left: 2px;
+}
+
+.received .message-status {
+  display: none;
 }

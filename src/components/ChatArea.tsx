@@ -2,7 +2,7 @@ import React from 'react';
 import { featureCards } from '../data/dummyData';
 import FeatureCard from './FeatureCard';
 import ChatAreaHeader from './ChatAreaHeader';
-import { Wand2, Paperclip, Mic, SendHorizonal, Bot } from 'lucide-react';
+import { Wand2, Paperclip, Mic, SendHorizonal, Bot, Lock, Check, CheckCheck } from 'lucide-react';
 import { IRoom } from '../types/Chat';
 import { useChatArea } from '../hooks/useChatArea';
 import { useAuth } from '../context/AuthContext';
@@ -81,6 +81,12 @@ const ChatArea: React.FC<ChatAreaProps> = ({ isDarkMode, onToggleDarkMode, room 
           <div className="loading-container">Loading messages...</div>
         ) : (
           <div className="messages-list">
+            <div className="encryption-notice">
+              <Lock size={12} />
+              <span>
+                Pesan dan panggilan terenkripsi secara end-to-end. Tidak seorang pun di luar chat ini, termasuk Messanger, yang dapat membaca atau mendengarkannya. <strong>Pelajari selengkapnya</strong>
+              </span>
+            </div>
             {messages.map((msg) => {
               const currentUserId = user?.id || (user as any)?.user_id;
               const isMe = currentUserId && msg.senderId && String(msg.senderId) === String(currentUserId);
@@ -99,6 +105,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ isDarkMode, onToggleDarkMode, room 
                       <div className="message-text">{msg.content}</div>
                       <div className="message-footer">
                         <span className="message-time">{formatMessageDate(msg.createdAt)}</span>
+                        {isMe && <CheckCheck size={14} className="message-status" />}
                       </div>
                     </div>
                   </div>
