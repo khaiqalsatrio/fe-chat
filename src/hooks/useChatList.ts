@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { chatService } from '../services/chatService';
 import { IRoom } from '../types/Chat';
 
@@ -6,7 +6,7 @@ export const useChatList = () => {
   const [rooms, setRooms] = useState<IRoom[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const refresh = async () => {
+  const refresh = useCallback(async () => {
     try {
       const data = await chatService.getRooms();
       setRooms(data);
@@ -15,11 +15,11 @@ export const useChatList = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     refresh();
-  }, []);
+  }, [refresh]);
 
   return { rooms, loading, refresh };
 };

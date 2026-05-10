@@ -8,7 +8,12 @@ class SocketService {
   private socket: Socket | null = null;
 
   connect() {
-    if (this.socket?.connected) return this.socket;
+    if (this.socket) {
+      if (this.socket.connected) return this.socket;
+      // Jika sudah ada instance tapi belum connected, biarkan dia mencoba connect sendiri
+      // (socket.io otomatis melakukan reconnection/initial connection)
+      return this.socket;
+    }
 
     const token = localStorage.getItem('token');
     if (!token) return null;
@@ -17,7 +22,7 @@ class SocketService {
 
     this.socket = io(BASE_URL, {
       auth: { token },
-      transports: ['websocket', 'polling'], // Tambahkan polling sebagai fallback
+      transports: ['websocket', 'polling'],
       reconnection: true,
       reconnectionAttempts: 10,
       reconnectionDelay: 1000,

@@ -155,7 +155,10 @@ const ChatArea: React.FC<ChatAreaProps> = ({ isDarkMode, onToggleDarkMode, room,
                   {/* Avatar di kiri untuk pesan masuk */}
                   {!isMe && (
                     <div className="message-avatar">
-                      <img src={`https://ui-avatars.com/api/?name=${msg.sender?.username || 'User'}&background=random`} alt="avatar" />
+                      <img 
+                        src={msg.sender?.avatarUrl ? `http://localhost:4000${msg.sender.avatarUrl}` : `https://ui-avatars.com/api/?name=${msg.sender?.username || 'User'}&background=random`} 
+                        alt="avatar" 
+                      />
                     </div>
                   )}
 
@@ -184,7 +187,10 @@ const ChatArea: React.FC<ChatAreaProps> = ({ isDarkMode, onToggleDarkMode, room,
                   {/* Avatar di kanan untuk pesan kita */}
                   {isMe && (
                     <div className="message-avatar">
-                      <img src={`https://ui-avatars.com/api/?name=${user?.username || 'Me'}&background=4f46e5&color=fff`} alt="avatar" />
+                      <img 
+                        src={user?.avatarUrl ? `http://localhost:4000${user.avatarUrl}` : `https://ui-avatars.com/api/?name=${user?.username || 'Me'}&background=4f46e5&color=fff`} 
+                        alt="avatar" 
+                      />
                     </div>
                   )}
                 </div>

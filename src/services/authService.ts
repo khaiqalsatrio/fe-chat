@@ -1,5 +1,5 @@
 import { apiClient } from './apiClient';
-import { IUser } from '../types/User';
+import { User, IUser } from '../types/User';
 
 interface AuthResponse {
   user: IUser;
@@ -8,20 +8,21 @@ interface AuthResponse {
 
 export const authService = {
   async login(email: string, password: string): Promise<IUser> {
-    const response = await apiClient.post<AuthResponse>('/auth/login', { email, password });
+    const response = await apiClient.post<any>('/auth/login', { email, password });
     if (response.access_token) {
       localStorage.setItem('token', response.access_token);
     }
-    return response.user;
+    return new User(response.user);
   },
 
   async register(userData: any): Promise<IUser> {
-    const response = await apiClient.post<IUser>('/auth/register', userData);
-    return response;
+    const response = await apiClient.post<any>('/auth/register', userData);
+    return new User(response);
   },
 
   async getCurrentUser(): Promise<IUser> {
-    return await apiClient.get<IUser>('/auth/me');
+    const data = await apiClient.get<any>('/auth/me');
+    return new User(data);
   },
 
   async logout(): Promise<void> {

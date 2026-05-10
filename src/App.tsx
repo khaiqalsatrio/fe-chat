@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext';
 import LoginView from './views/LoginView';
 import RegisterView from './views/RegisterView';
 import ChatView from './views/ChatView';
+import ProfileView from './views/ProfileView';
 import ProtectedRoute from './components/ProtectedRoute';
 import './assets/css/global/App.css';
 
@@ -19,6 +20,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <ChatView />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/profile" 
+            element={
+              <ProtectedRoute>
+                <ProfileView />
               </ProtectedRoute>
             } 
           />

@@ -9,8 +9,10 @@ import {
   Library, 
   Bell, 
   Settings,
-  LogOut
+  LogOut,
+  User
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLogout } from '../hooks/useLogout';
 import LogoutModal from './LogoutModal';
@@ -22,13 +24,18 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { handleLogout, loading: isLoggingOut } = useLogout();
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   return (
     <div className={`sidebar ${!isOpen ? 'collapsed' : ''}`}>
       <div className="sidebar-top">
-        <div className="sidebar-item active">
+        <div 
+          className={`sidebar-item ${window.location.pathname === '/chat' || window.location.pathname === '/' ? 'active' : ''}`}
+          onClick={() => navigate('/chat')}
+          style={{ cursor: 'pointer' }}
+        >
           <span className="sidebar-icon"><MessageSquare size={20} /></span>
           <span className="sidebar-label">Chats</span>
         </div>
@@ -63,6 +70,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
           <span className="sidebar-icon"><FileText size={20} /></span>
           <span className="sidebar-label">Saved</span>
         </div>
+        <div 
+          className={`sidebar-item ${window.location.pathname === '/profile' ? 'active' : ''}`}
+          onClick={() => navigate('/profile')}
+        >
+          <span className="sidebar-icon"><User size={20} /></span>
+          <span className="sidebar-label">Profile</span>
+        </div>
         <div className="sidebar-item badge-container">
           <span className="sidebar-icon"><Bell size={20} /></span>
           <span className="sidebar-label">Notifications</span>
@@ -79,8 +93,22 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
           <span className="sidebar-icon"><Settings size={20} /></span>
           <span className="sidebar-label">Settings</span>
         </div>
-        <div className="sidebar-avatar-container">
-          <div className="sidebar-avatar">{user?.username?.substring(0, 2).toUpperCase() || '??'}</div>
+        <div 
+          className="sidebar-avatar-container" 
+          onClick={() => navigate('/profile')}
+          style={{ cursor: 'pointer' }}
+        >
+          <div 
+            className="sidebar-avatar"
+            style={user?.avatarUrl ? { 
+              backgroundImage: `url(http://localhost:4000${user.avatarUrl})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              color: 'transparent'
+            } : undefined}
+          >
+            {!user?.avatarUrl && (user?.username?.substring(0, 2).toUpperCase() || '??')}
+          </div>
           <span className="sidebar-label">{user?.username || 'Guest'}</span>
         </div>
       </div>

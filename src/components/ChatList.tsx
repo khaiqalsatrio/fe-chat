@@ -21,8 +21,14 @@ const ChatList: React.FC<ChatListProps> = ({ toggleSidebar, onSelectRoom, select
 
   const getRoomName = (room: IRoom) => {
     if (room.name) return room.name;
-    const otherParticipant = room.participants?.find(p => p.user_id !== user?.id);
+    const otherParticipant = room.participants?.find(p => String(p.user_id) !== String(user?.id));
     return otherParticipant?.user?.username || 'Personal Chat';
+  };
+
+  const getRoomAvatar = (room: IRoom) => {
+    const otherParticipant = room.participants?.find(p => String(p.user_id) !== String(user?.id));
+    if (!otherParticipant) return user?.avatarUrl; // Use own avatar for Personal Chat
+    return otherParticipant?.user?.avatarUrl;
   };
 
   return (
@@ -55,8 +61,16 @@ const ChatList: React.FC<ChatListProps> = ({ toggleSidebar, onSelectRoom, select
               className={`chat-item ${selectedRoomId === room.id ? 'active' : ''}`}
               onClick={() => onSelectRoom(room)}
             >
-              <div className="item-icon direct">
-                <User size={22} />
+              <div 
+                className="item-icon direct"
+                style={getRoomAvatar(room) ? {
+                  backgroundImage: `url(http://localhost:4000${getRoomAvatar(room)})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  color: 'transparent'
+                } : undefined}
+              >
+                {!getRoomAvatar(room) && <User size={22} />}
               </div>
               <div className="item-content">
                 <div className="item-header">

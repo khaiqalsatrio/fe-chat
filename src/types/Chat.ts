@@ -1,4 +1,4 @@
-import { IUser } from './User';
+import { IUser, User } from './User';
 
 export interface IMessage {
   id: string;
@@ -42,7 +42,7 @@ export class Message implements IMessage {
     this.content = data.content;
     this.type = data.type;
     this.createdAt = data.createdAt || data.created_at;
-    this.sender = data.sender;
+    this.sender = data.sender ? new User(data.sender) : undefined;
   }
 }
 
@@ -57,7 +57,10 @@ export class Room implements IRoom {
     this.id = id;
     this.name = name;
     this.type = type;
-    this.lastMessage = lastMessage;
-    this.participants = participants;
+    this.lastMessage = lastMessage ? new Message(lastMessage) : undefined;
+    this.participants = participants ? participants.map((p: any) => ({
+      ...p,
+      user: p.user ? new User(p.user) : undefined
+    })) : [];
   }
 }
