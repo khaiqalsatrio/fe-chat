@@ -2,9 +2,12 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { User, Mail, Lock, Eye, EyeOff, MessageSquare, Zap, Shield, ArrowRight, Loader2 } from 'lucide-react';
 import { useRegister } from '../hooks/useRegister';
+import { useAuth } from '../context/AuthContext';
 import '../assets/css/views/Auth.css';
+import { Navigate } from 'react-router-dom';
 
 const RegisterView: React.FC = () => {
+  const { user, loading: authLoading } = useAuth();
   const {
     username, setUsername,
     email, setEmail,
@@ -12,6 +15,10 @@ const RegisterView: React.FC = () => {
     showPassword, setShowPassword,
     error, loading, handleSubmit
   } = useRegister();
+
+  if (user && !authLoading) {
+    return <Navigate to="/chat" replace />;
+  }
 
   return (
     <div className="auth-container">

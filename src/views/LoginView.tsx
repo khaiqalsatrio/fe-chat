@@ -2,15 +2,22 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, MessageSquare, Zap, Shield, ArrowRight, Loader2 } from 'lucide-react';
 import { useLogin } from '../hooks/useLogin';
+import { useAuth } from '../context/AuthContext';
 import '../assets/css/views/Auth.css';
+import { Navigate } from 'react-router-dom';
 
 const LoginView: React.FC = () => {
+  const { user, loading: authLoading } = useAuth();
   const {
     email, setEmail,
     password, setPassword,
     showPassword, setShowPassword,
     error, loading, handleSubmit
   } = useLogin();
+
+  if (user && !authLoading) {
+    return <Navigate to="/chat" replace />;
+  }
 
   return (
     <div className="auth-container">
