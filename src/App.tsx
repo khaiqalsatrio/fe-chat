@@ -4,7 +4,7 @@ import { AuthProvider } from './context/AuthContext';
 import LoginView from './views/LoginView';
 import RegisterView from './views/RegisterView';
 import ChatView from './views/ChatView';
-import './App.css';
+import './assets/css/global/App.css';
 
 function App() {
   return (

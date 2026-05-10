@@ -1,7 +1,7 @@
 import React from 'react';
 import { FeatureCardData } from '../data/dummyData';
 import { MessageSquare, FileText, Folder, BarChart3, History, BookOpen } from 'lucide-react';
-import './FeatureCard.css';
+import '../assets/css/components/FeatureCard.css';
 
 interface Props {
   data: FeatureCardData;

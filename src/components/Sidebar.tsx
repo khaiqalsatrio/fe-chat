@@ -12,27 +12,16 @@ import {
   LogOut
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import { socketService } from '../services/socketService';
-import './Sidebar.css';
+import { useLogout } from '../hooks/useLogout';
+import '../assets/css/components/Sidebar.css';
 
 interface SidebarProps {
   isOpen: boolean;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
-
-  const handleLogout = async () => {
-    try {
-      socketService.disconnect();
-      await logout();
-      navigate('/login');
-    } catch (error) {
-      console.error('Logout failed', error);
-    }
-  };
+  const { user } = useAuth();
+  const { handleLogout } = useLogout();
 
   return (
     <div className={`sidebar ${!isOpen ? 'collapsed' : ''}`}>

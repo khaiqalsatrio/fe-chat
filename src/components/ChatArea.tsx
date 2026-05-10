@@ -1,13 +1,12 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React from 'react';
 import { featureCards } from '../data/dummyData';
 import FeatureCard from './FeatureCard';
 import ChatAreaHeader from './ChatAreaHeader';
 import { Wand2, Paperclip, Mic, SendHorizonal, Bot } from 'lucide-react';
-import { chatService } from '../services/chatService';
-import { IMessage, IRoom } from '../types/Chat';
-import { useSocket } from '../hooks/useSocket';
+import { IRoom } from '../types/Chat';
+import { useChatArea } from '../hooks/useChatArea';
 import { useAuth } from '../context/AuthContext';
-import './ChatArea.css';
+import '../assets/css/components/ChatArea.css';
 
 interface ChatAreaProps {
   isDarkMode: boolean;
@@ -17,86 +16,16 @@ interface ChatAreaProps {
 
 const ChatArea: React.FC<ChatAreaProps> = ({ isDarkMode, onToggleDarkMode, room }) => {
   const roomId = room?.id || null;
-  const [messages, setMessages] = useState<IMessage[]>([]);
-  const [inputValue, setInputValue] = useState('');
-  const [loading, setLoading] = useState(false);
   const { user } = useAuth();
-  const socket = useSocket(roomId || undefined);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  // Selalu urutkan pesan secara otomatis
-  const sortedMessages = useMemo(() => {
-    return [...messages].sort((a, b) => 
-      new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-    );
-  }, [messages]);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [sortedMessages]);
-
-  useEffect(() => {
-    if (roomId) {
-      const fetchMessages = async () => {
-        setLoading(true);
-        try {
-          const data = await chatService.getMessages(roomId);
-          setMessages(data);
-        } catch (error) {
-          console.error('Failed to fetch messages', error);
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      fetchMessages();
-
-      // Listen for real-time messages
-      socket.onReceiveMessage((message: IMessage) => {
-        if (message.roomId === roomId) {
-          setMessages(prev => {
-            if (prev.find(m => m.id === message.id)) return prev;
-            return [...prev, message];
-          });
-        }
-      });
-
-      return () => {
-        socket.offReceiveMessage();
-      };
-    } else {
-      setMessages([]);
-    }
-  }, [roomId, socket]);
-
-  const handleSendMessage = async () => {
-    if (!roomId || !inputValue.trim()) return;
-
-    const content = inputValue;
-    setInputValue('');
-
-    try {
-      // Kirim via Socket agar real-time ke semua orang di room
-      socket.sendMessage(roomId, content);
-      
-      // Opsional: Tetap panggil API jika backend membutuhkan persistensi lewat REST
-      // Namun biasanya backend sudah menangani persistensi di dalam Socket Gateway
-      // await chatService.sendMessage(roomId, content);
-      
-    } catch (error) {
-      console.error('Failed to send message', error);
-    }
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleSendMessage();
-    }
-  };
+  const {
+    messages,
+    inputValue,
+    setInputValue,
+    loading,
+    messagesEndRef,
+    handleSendMessage,
+    handleKeyPress
+  } = useChatArea(roomId);
 
   const getRoomName = () => {
     if (!room) return '';
@@ -152,7 +81,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ isDarkMode, onToggleDarkMode, room 
           <div className="loading-container">Loading messages...</div>
         ) : (
           <div className="messages-list">
-            {sortedMessages.map((msg) => {
+            {messages.map((msg) => {
               const currentUserId = user?.id || (user as any)?.user_id;
               const isMe = currentUserId && msg.senderId && String(msg.senderId) === String(currentUserId);
 

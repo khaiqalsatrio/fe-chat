@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { chatService } from '../services/chatService';
+import React from 'react';
+import { useChatList } from '../hooks/useChatList';
 import { IRoom } from '../types/Chat';
-import './ChatList.css';
+import '../assets/css/components/ChatList.css';
 import ChatListHeader from './ChatListHeader';
 import { Search, Bot, FileText, User } from 'lucide-react';
 
@@ -15,24 +15,8 @@ interface ChatListProps {
 }
 
 const ChatList: React.FC<ChatListProps> = ({ toggleSidebar, onSelectRoom, selectedRoomId }) => {
-  const [rooms, setRooms] = useState<IRoom[]>([]);
-  const [loading, setLoading] = useState(true);
   const { user } = useAuth();
-
-  useEffect(() => {
-    const fetchRooms = async () => {
-      try {
-        const data = await chatService.getRooms();
-        setRooms(data);
-      } catch (error) {
-        console.error('Failed to fetch rooms', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchRooms();
-  }, []);
+  const { rooms, loading } = useChatList();
 
   const getRoomName = (room: IRoom) => {
     if (room.name) return room.name;

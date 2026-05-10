@@ -1,31 +1,16 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, MessageSquare, Zap, Shield, ArrowRight, Loader2 } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
-import './Auth.css';
+import { useLogin } from '../hooks/useLogin';
+import '../assets/css/views/Auth.css';
 
 const LoginView: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
-  const { login } = useAuth();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-    try {
-      await login(email, password);
-      navigate('/chat');
-    } catch (err: any) {
-      setError(err.message || 'Failed to login');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const {
+    email, setEmail,
+    password, setPassword,
+    showPassword, setShowPassword,
+    error, loading, handleSubmit
+  } = useLogin();
 
   return (
     <div className="auth-container">

@@ -4,7 +4,7 @@ import ChatList from '../components/ChatList';
 import ChatArea from '../components/ChatArea';
 import { IRoom } from '../types/Chat';
 import { useSocket } from '../hooks/useSocket';
-import '../App.css';
+import '../assets/css/global/App.css';
 
 const ChatView: React.FC = () => {
   useSocket(); // Initialize socket connection
