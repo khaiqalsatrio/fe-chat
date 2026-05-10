@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   MessageSquare, 
   BarChart3, 
@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLogout } from '../hooks/useLogout';
+import LogoutModal from './LogoutModal';
 import '../assets/css/components/Sidebar.css';
 
 interface SidebarProps {
@@ -21,7 +22,8 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
   const { user } = useAuth();
-  const { handleLogout } = useLogout();
+  const { handleLogout, loading: isLoggingOut } = useLogout();
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   return (
     <div className={`sidebar ${!isOpen ? 'collapsed' : ''}`}>
@@ -69,7 +71,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
       </div>
       
       <div className="sidebar-bottom">
-        <div className="sidebar-item" onClick={handleLogout} style={{ cursor: 'pointer' }}>
+        <div className="sidebar-item" onClick={() => setIsLogoutModalOpen(true)} style={{ cursor: 'pointer' }}>
           <span className="sidebar-icon"><LogOut size={20} /></span>
           <span className="sidebar-label">Logout</span>
         </div>
@@ -82,6 +84,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
           <span className="sidebar-label">{user?.username || 'Guest'}</span>
         </div>
       </div>
+
+      <LogoutModal 
+        isOpen={isLogoutModalOpen} 
+        isLoading={isLoggingOut}
+        onClose={() => setIsLogoutModalOpen(false)} 
+        onConfirm={handleLogout} 
+      />
     </div>
   );
 };
