@@ -40,17 +40,19 @@ export const useChatArea = (roomId: string | null) => {
 
       fetchMessages();
 
-      socket.onReceiveMessage((message: IMessage) => {
+      const handleIncomingMessage = (message: IMessage) => {
         if (message.roomId === roomId) {
           setMessages(prev => {
             if (prev.find(m => m.id === message.id)) return prev;
             return [...prev, message];
           });
         }
-      });
+      };
+
+      socket.onReceiveMessage(handleIncomingMessage);
 
       return () => {
-        socket.offReceiveMessage();
+        socket.offReceiveMessage(handleIncomingMessage);
       };
     } else {
       setMessages([]);

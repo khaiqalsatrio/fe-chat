@@ -6,15 +6,50 @@ import { IRoom } from '../types/Chat';
 import { useSocket } from '../hooks/useSocket';
 import '../assets/css/global/App.css';
 import { useChatList } from '../hooks/useChatList';
+import { useAuth } from '../context/AuthContext';
+import { notificationService } from '../services/notificationService';
+import { IMessage } from '../types/Chat';
 
 const ChatView: React.FC = () => {
-  useSocket(); // Initialize socket connection
+  const socket = useSocket(); // Initialize socket connection
+  const { user } = useAuth();
   const { rooms, loading, refresh } = useChatList();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState<IRoom | null>(null);
   const [isDarkMode, setIsDarkMode] = useState(() => {
     return localStorage.getItem('theme') === 'dark';
   });
+
+  useEffect(() => {
+    // Listen for all messages globally for notifications
+    const handleGlobalMessage = (message: IMessage) => {
+      const currentUserId = user?.id || (user as any)?.user_id;
+      const isMe = currentUserId && message.senderId && String(message.senderId) === String(currentUserId);
+      
+      // Only notify if:
+      // 1. It's not my own message
+      // 2. The room is not currently open OR the window is not focused
+      console.log('📬 Message received globally:', { 
+        from: message.sender?.username, 
+        isMe, 
+        permission: Notification.permission 
+      });
+
+      // Show notification for EVERY message that isn't from me
+      if (!isMe) {
+        notificationService.notify(message);
+      }
+      
+      // Refresh list to show last message/badge
+      refresh();
+    };
+
+    socket.onReceiveMessage(handleGlobalMessage);
+
+    return () => {
+      socket.offReceiveMessage(handleGlobalMessage);
+    };
+  }, [socket, user, selectedRoom, refresh]);
 
   useEffect(() => {
     if (isDarkMode) {

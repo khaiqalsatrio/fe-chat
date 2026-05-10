@@ -72,18 +72,33 @@ class SocketService {
     this.socket?.emit('send_message', { roomId, content, type });
   }
 
+  private messageCallbacks: ((message: Message) => void)[] = [];
+
   onReceiveMessage(callback: (message: Message) => void) {
     if (!this.socket) this.connect();
     
-    this.socket?.off('receive_message'); // Bersihkan listener lama
-    this.socket?.on('receive_message', (data: any) => {
-      console.log('📨 New message received via socket:', data);
-      callback(new Message(data));
-    });
+    this.messageCallbacks.push(callback);
+    
+    // Set up the socket listener only once
+    if (this.messageCallbacks.length === 1) {
+      this.socket?.on('receive_message', (data: any) => {
+        const message = new Message(data);
+        console.log('📨 New message received via socket:', message);
+        this.messageCallbacks.forEach(cb => cb(message));
+      });
+    }
   }
 
-  offReceiveMessage() {
-    this.socket?.off('receive_message');
+  offReceiveMessage(callback?: (message: Message) => void) {
+    if (callback) {
+      this.messageCallbacks = this.messageCallbacks.filter(cb => cb !== callback);
+      if (this.messageCallbacks.length === 0) {
+        this.socket?.off('receive_message');
+      }
+    } else {
+      this.messageCallbacks = [];
+      this.socket?.off('receive_message');
+    }
   }
 
   // Helper untuk debugging
