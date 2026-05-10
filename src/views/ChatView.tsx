@@ -5,9 +5,11 @@ import ChatArea from '../components/ChatArea';
 import { IRoom } from '../types/Chat';
 import { useSocket } from '../hooks/useSocket';
 import '../assets/css/global/App.css';
+import { useChatList } from '../hooks/useChatList';
 
 const ChatView: React.FC = () => {
   useSocket(); // Initialize socket connection
+  const { rooms, loading, refresh } = useChatList();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState<IRoom | null>(null);
   const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -30,16 +32,20 @@ const ChatView: React.FC = () => {
   return (
     <div className={`App ${!isSidebarOpen ? 'sidebar-closed' : ''}`}>
       <Sidebar isOpen={isSidebarOpen} />
-      <ChatList 
-        toggleSidebar={toggleSidebar} 
-        isSidebarOpen={isSidebarOpen} 
+      <ChatList
+        toggleSidebar={toggleSidebar}
+        isSidebarOpen={isSidebarOpen}
         onSelectRoom={setSelectedRoom}
         selectedRoomId={selectedRoom?.id || null}
+        rooms={rooms}
+        loading={loading}
       />
-      <ChatArea 
-        isDarkMode={isDarkMode} 
-        onToggleDarkMode={toggleDarkMode} 
+      <ChatArea
+        isDarkMode={isDarkMode}
+        onToggleDarkMode={toggleDarkMode}
         room={selectedRoom}
+        onSelectRoom={setSelectedRoom}
+        onRefresh={refresh}
       />
     </div>
   );

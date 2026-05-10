@@ -12,11 +12,12 @@ interface ChatListProps {
   isSidebarOpen: boolean;
   onSelectRoom: (room: IRoom) => void;
   selectedRoomId: string | null;
+  rooms: IRoom[];
+  loading: boolean;
 }
 
-const ChatList: React.FC<ChatListProps> = ({ toggleSidebar, onSelectRoom, selectedRoomId }) => {
+const ChatList: React.FC<ChatListProps> = ({ toggleSidebar, onSelectRoom, selectedRoomId, rooms, loading }) => {
   const { user } = useAuth();
-  const { rooms, loading } = useChatList();
 
   const getRoomName = (room: IRoom) => {
     if (room.name) return room.name;

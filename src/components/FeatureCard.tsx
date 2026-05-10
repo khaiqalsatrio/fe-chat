@@ -5,6 +5,7 @@ import '../assets/css/components/FeatureCard.css';
 
 interface Props {
   data: FeatureCardData;
+  onClick?: () => void;
 }
 
 const iconMap: Record<string, React.ReactNode> = {
@@ -16,9 +17,9 @@ const iconMap: Record<string, React.ReactNode> = {
   '📚': <BookOpen size={24} />,
 };
 
-const FeatureCard: React.FC<Props> = ({ data }) => {
+const FeatureCard: React.FC<Props> = ({ data, onClick }) => {
   return (
-    <div className="feature-card">
+    <div className="feature-card" onClick={onClick} style={{ cursor: onClick ? 'pointer' : 'default' }}>
       <div className="feature-icon" style={{ backgroundColor: data.bgColor, color: data.color }}>
         {iconMap[data.icon] || data.icon}
       </div>

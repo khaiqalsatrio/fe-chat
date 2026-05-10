@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { featureCards } from '../data/dummyData';
 import FeatureCard from './FeatureCard';
 import ChatAreaHeader from './ChatAreaHeader';
@@ -6,15 +6,21 @@ import { Wand2, Paperclip, Mic, SendHorizonal, Bot, Lock, Check, CheckCheck } fr
 import { IRoom } from '../types/Chat';
 import { useChatArea } from '../hooks/useChatArea';
 import { useAuth } from '../context/AuthContext';
+import { chatService } from '../services/chatService';
+import { IUser } from '../types/User';
+import NewChatModal from './NewChatModal';
 import '../assets/css/components/ChatArea.css';
 
 interface ChatAreaProps {
   isDarkMode: boolean;
   onToggleDarkMode: () => void;
   room: IRoom | null;
+  onSelectRoom: (room: IRoom) => void;
+  onRefresh: () => void;
 }
 
-const ChatArea: React.FC<ChatAreaProps> = ({ isDarkMode, onToggleDarkMode, room }) => {
+const ChatArea: React.FC<ChatAreaProps> = ({ isDarkMode, onToggleDarkMode, room, onSelectRoom, onRefresh }) => {
+  const [isNewChatModalOpen, setIsNewChatModalOpen] = useState(false);
   const roomId = room?.id || null;
   const { user } = useAuth();
   const {
@@ -50,6 +56,17 @@ const ChatArea: React.FC<ChatAreaProps> = ({ isDarkMode, onToggleDarkMode, room 
     }
   };
 
+  const handleSelectUser = async (targetUser: IUser) => {
+    try {
+      const newRoom = await chatService.createDirectChat(targetUser.id);
+      onSelectRoom(newRoom);
+      onRefresh();
+      setIsNewChatModalOpen(false);
+    } catch (error) {
+      console.error('Failed to create chat', error);
+    }
+  };
+
   return (
     <div className="chat-area">
       <ChatAreaHeader
@@ -72,7 +89,11 @@ const ChatArea: React.FC<ChatAreaProps> = ({ isDarkMode, onToggleDarkMode, room 
 
               <div className="feature-grid">
                 {featureCards.map(card => (
-                  <FeatureCard key={card.id} data={card} />
+                  <FeatureCard 
+                    key={card.id} 
+                    data={card} 
+                    onClick={card.id === 'chat' ? () => setIsNewChatModalOpen(true) : undefined}
+                  />
                 ))}
               </div>
             </div>
@@ -147,6 +168,12 @@ const ChatArea: React.FC<ChatAreaProps> = ({ isDarkMode, onToggleDarkMode, room 
         </div>
         <p className="input-hint">You can be messy, emotional, or unclear. AI will help you make sense of it.</p>
       </div>
+
+      <NewChatModal 
+        isOpen={isNewChatModalOpen} 
+        onClose={() => setIsNewChatModalOpen(false)}
+        onSelectUser={handleSelectUser}
+      />
     </div>
   );
 };

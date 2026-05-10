@@ -6,20 +6,20 @@ export const useChatList = () => {
   const [rooms, setRooms] = useState<IRoom[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchRooms = async () => {
-      try {
-        const data = await chatService.getRooms();
-        setRooms(data);
-      } catch (error) {
-        console.error('Failed to fetch rooms', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const refresh = async () => {
+    try {
+      const data = await chatService.getRooms();
+      setRooms(data);
+    } catch (error) {
+      console.error('Failed to fetch rooms', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchRooms();
+  useEffect(() => {
+    refresh();
   }, []);
 
-  return { rooms, loading };
+  return { rooms, loading, refresh };
 };
