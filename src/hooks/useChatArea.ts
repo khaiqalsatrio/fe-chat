@@ -70,6 +70,23 @@ export const useChatArea = (roomId: string | null) => {
     }
   };
 
+  const handleSendFile = async (file: File) => {
+    if (!roomId) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64String = reader.result as string;
+      const type = file.type.startsWith('image/') ? 'IMAGE' : 'FILE';
+      
+      try {
+        socket.sendMessage(roomId, base64String, type);
+      } catch (error) {
+        console.error('Failed to send file', error);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       handleSendMessage();
@@ -83,6 +100,7 @@ export const useChatArea = (roomId: string | null) => {
     loading,
     messagesEndRef,
     handleSendMessage,
+    handleSendFile,
     handleKeyPress
   };
 };

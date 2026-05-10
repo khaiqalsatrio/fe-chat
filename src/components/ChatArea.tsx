@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { featureCards } from '../data/dummyData';
 import FeatureCard from './FeatureCard';
 import ChatAreaHeader from './ChatAreaHeader';
-import { Wand2, Paperclip, Mic, SendHorizonal, Bot, Lock, Check, CheckCheck } from 'lucide-react';
+import { Wand2, Paperclip, Mic, SendHorizonal, Bot, Lock, Check, CheckCheck, FileText, Image as ImageIcon, X } from 'lucide-react';
 import { IRoom } from '../types/Chat';
 import { useChatArea } from '../hooks/useChatArea';
 import { useAuth } from '../context/AuthContext';
@@ -21,6 +21,10 @@ interface ChatAreaProps {
 
 const ChatArea: React.FC<ChatAreaProps> = ({ isDarkMode, onToggleDarkMode, room, onSelectRoom, onRefresh }) => {
   const [isNewChatModalOpen, setIsNewChatModalOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [filePreview, setFilePreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const roomId = room?.id || null;
   const { user } = useAuth();
   const {
@@ -30,6 +34,7 @@ const ChatArea: React.FC<ChatAreaProps> = ({ isDarkMode, onToggleDarkMode, room,
     loading,
     messagesEndRef,
     handleSendMessage,
+    handleSendFile,
     handleKeyPress
   } = useChatArea(roomId);
 
@@ -64,6 +69,39 @@ const ChatArea: React.FC<ChatAreaProps> = ({ isDarkMode, onToggleDarkMode, room,
       setIsNewChatModalOpen(false);
     } catch (error) {
       console.error('Failed to create chat', error);
+    }
+  };
+
+  const onFileSelectClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onloadend = () => setFilePreview(reader.result as string);
+        reader.readAsDataURL(file);
+      } else {
+        setFilePreview(null);
+      }
+    }
+  };
+
+  const clearFile = () => {
+    setSelectedFile(null);
+    setFilePreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handleSendAction = () => {
+    if (selectedFile) {
+      handleSendFile(selectedFile);
+      clearFile();
+    } else {
+      handleSendMessage();
     }
   };
 
@@ -123,7 +161,19 @@ const ChatArea: React.FC<ChatAreaProps> = ({ isDarkMode, onToggleDarkMode, room,
 
                   <div className="message-bubble-container">
                     <div className="message-bubble">
-                      <div className="message-text">{msg.content}</div>
+                      {msg.type === 'IMAGE' ? (
+                        <div className="message-image">
+                          <img src={msg.content} alt="sent-file" onClick={() => window.open(msg.content)} />
+                        </div>
+                      ) : msg.type === 'FILE' ? (
+                        <div className="message-file-attachment">
+                          <FileText size={20} />
+                          <span>File Attachment</span>
+                        </div>
+                      ) : (
+                        <div className="message-text">{msg.content}</div>
+                      )}
+                      
                       <div className="message-footer">
                         <span className="message-time">{formatMessageDate(msg.createdAt)}</span>
                         {isMe && <CheckCheck size={14} className="message-status" />}
@@ -146,22 +196,44 @@ const ChatArea: React.FC<ChatAreaProps> = ({ isDarkMode, onToggleDarkMode, room,
       </div>
 
       <div className="input-container">
+        {selectedFile && (
+          <div className="file-preview-bar">
+            {filePreview ? (
+              <div className="img-preview">
+                <img src={filePreview} alt="preview" />
+              </div>
+            ) : (
+              <div className="doc-preview">
+                <FileText size={20} />
+                <span>{selectedFile.name}</span>
+              </div>
+            )}
+            <button className="remove-file" onClick={clearFile}><X size={16} /></button>
+          </div>
+        )}
+
         <div className="input-wrapper">
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            style={{ display: 'none' }} 
+            onChange={handleFileChange}
+          />
           <button className="input-action"><Wand2 size={18} /></button>
-          <button className="input-action"><Paperclip size={18} /></button>
+          <button className="input-action" onClick={onFileSelectClick}><Paperclip size={18} /></button>
           <button className="input-action"><Mic size={18} /></button>
           <input
             type="text"
             placeholder={roomId ? "Type freely... no judgment here" : "Select a room first"}
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            onKeyPress={handleKeyPress}
+            onKeyPress={(e) => e.key === 'Enter' && handleSendAction()}
             disabled={!roomId}
           />
           <button
             className="send-btn"
-            onClick={handleSendMessage}
-            disabled={!roomId || !inputValue.trim()}
+            onClick={handleSendAction}
+            disabled={!roomId || (!inputValue.trim() && !selectedFile)}
           >
             <SendHorizonal size={18} />
           </button>
